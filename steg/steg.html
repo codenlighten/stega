@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<!-- encryption cryptojs -->
+		<script src="https://unpkg.com/bsv@1.5"></script>
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/3.1.2/rollups/aes.js"></script>
+		<!-- twitter -->
+		<meta name="twitter:card" content="summary_large_image" />
+		<meta name="twitter:site" content="@codenlighten" />
+		<meta name="twitter:creator" content="@codenlighten" />
+		<meta name="twitter:title" content="Steganography- Embed Text in Images" />
+		<meta
+			name="twitter:description"
+			content="Steganography- Embed Text in Images"
+		/>
+		<meta
+			name="twitter:image"
+			content="https://plugins.whatsonchain.com/api/plugin/main/efc55f1db5b7012d7299d87b9a967c12905953a80226869574027bd5bbce0272"
+		/>
+		<!-- favicon https://plugins.whatsonchain.com/api/plugin/main/efc55f1db5b7012d7299d87b9a967c12905953a80226869574027bd5bbce0272 -->
+		<link
+			rel="icon"
+			type="image/png"
+			href="https://plugins.whatsonchain.com/api/plugin/main/efc55f1db5b7012d7299d87b9a967c12905953a80226869574027bd5bbce0272"
+		/>
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+			body {
+				background-color: #f5f5f5;
+				font-family: sans-serif;
+				word-wrap: break-word;
+			}
+			.container {
+				width: 80%;
+				margin: 0 auto;
+				padding: 20px;
+				background-color: #fff;
+				border-radius: 5px;
+				box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+				margin-top: 20px;
+			}
+			#header {
+				text-align: center;
+			}
+			#header img {
+				border-radius: 50%;
+			}
+			#header h1 {
+				margin-top: 10px;
+				font-size: 30px;
+			}
+			#header p {
+				margin-top: 10px;
+				font-size: 20px;
+			}
+			#choices {
+				margin-top: 20px;
+				text-align: center;
+			}
+			#choices button {
+				margin: 10px;
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				background-color: #4caf50;
+				color: #fff;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#choices button:hover {
+				background-color: #3e8e41;
+			}
+			#encrypt {
+				display: none;
+			}
+			#encrypt input[type="file"] {
+				margin-top: 20px;
+				margin-bottom: 20px;
+				display: block;
+			}
+			#encrypt textarea {
+				width: 100%;
+				height: 100px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+				resize: none;
+			}
+			#encrypt input[type="password"] {
+				width: 100%;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+			}
+			#encrypt button {
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				background-color: #4caf50;
+				color: #fff;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#encrypt button:hover {
+				background-color: #3e8e41;
+			}
+			#encrypt canvas {
+				margin-bottom: 20px;
+			}
+			#encrypt img {
+				margin-bottom: 20px;
+			}
+			#decrypt {
+				display: none;
+			}
+			#decrypt input[type="file"] {
+				margin-top: 20px;
+				margin-bottom: 20px;
+				display: block;
+			}
+			#decrypt input[type="password"] {
+				width: 100%;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+			}
+			#decrypt button {
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				background-color: #4caf50;
+				color: #fff;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#decrypt button:hover {
+				background-color: #3e8e41;
+			}
+			#decrypt #decodedText {
+				margin-bottom: 20px;
+			}
+			#decryptTxid {
+				display: none;
+			}
+			#decryptTxid input[type="text"] {
+				margin-top: 20px;
+				margin-bottom: 20px;
+				display: block;
+			}
+			#decryptTxid input[type="password"] {
+				width: 100%;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+			}
+			#decryptTxid button {
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				background-color: #4caf50;
+				color: #fff;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			#decryptTxid button:hover {
+				background-color: #3e8e41;
+			}
+			#decryptTxid #decodedText2 {
+				margin-bottom: 20px;
+			}
+
+			textarea {
+				width: 100%;
+				height: 100px;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+				resize: none;
+			}
+			input[type="password"] {
+				width: 100%;
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: 1px solid #ccc;
+			}
+			button {
+				margin-bottom: 20px;
+				padding: 10px;
+				border-radius: 5px;
+				border: none;
+				background-color: #4caf50;
+				color: #fff;
+				font-size: 20px;
+				cursor: pointer;
+			}
+			button:hover {
+				background-color: #3e8e41;
+			}
+			canvas {
+				width: 100%;
+				margin-bottom: 20px;
+			}
+			img {
+				width: 100%;
+				margin-bottom: 20px;
+			}
+			#decrypt #decodedText {
+				margin-bottom: 20px;
+			}
+			#logo {
+				width: 100px;
+				border-radius: 50%;
+			}
+			/* media max */
+			@media (max-width: 768px) {
+				.container {
+					width: 100%;
+				}
+				#logo {
+					width: 150px;
+				}
+			}
+		</style>
+		<title>Steganography- Embed Text in Images</title>
+	</head>
+	<body>
+		<div class="container" id="header">
+			<!-- https://plugins.whatsonchain.com/api/plugin/main/efc55f1db5b7012d7299d87b9a967c12905953a80226869574027bd5bbce0272 -->
+			<img
+				src="https://plugins.whatsonchain.com/api/plugin/main/efc55f1db5b7012d7299d87b9a967c12905953a80226869574027bd5bbce0272"
+				alt="Steganography- Embed Text in Images"
+				id="logo"
+			/>
+			<h1>Steganography- Embed Text in Images</h1>
+			<p>Enter text to embed in image</p>
+			<!-- buttons for choices -->
+			<p id="status"></p>
+
+			<div id="choices">
+				<button onclick="showEncrypt()">Encrypt Text in Image</button>
+				<button onclick="showDecrypt()">Decrypt Image</button>
+				<button onclick="showDecryptTxid()">Decrypt Txid</button>
+			</div>
+		</div>
+		<div class="container" id="encrypt">
+			<input type="file" id="imageUpload" accept="image/*" />
+			<textarea id="textToHide" placeholder="Enter text to hide..."></textarea>
+			<!-- password -->
+			<input type="password" id="password" placeholder="Enter password..." />
+			<button onclick="embedText()">Embed Text</button>
+			<canvas id="canvas" style="display: none"></canvas>
+			<button onclick="downloadImage()">Download Image</button>
+			<img id="resultImage" style="display: none" />
+		</div>
+		<div class="container" id="decrypt">
+			<h2>Decode Text</h2>
+			<p>Add file to decrypt</p>
+			<input type="file" id="imageToDecode" accept="image/*" />
+			<input type="password" id="password2" placeholder="Enter password..." />
+			<button onclick="decodeText()">Decode Text</button>
+			<div id="decodedText"></div>
+		</div>
+		<div class="container" id="decryptTxid">
+			<h2>Decode Text</h2>
+			<p>Add BSV TXID</p>
+			<input type="text" id="txid" placeholder="Enter BSV TXID..." />
+			<!-- password -->
+			<input type="password" id="password3" placeholder="Enter password..." />
+			<button onclick="decodeTxid()">Decode Text</button>
+			<img id="txPic" style="display: none" />
+			<div id="decodedText2"></div>
+		</div>
+		<!-- copyright codenlighten2023 -->
+		<div class="container" id="copyright">
+			<p>&copy; 2023 PrivateHumanity. All rights reserved.</p>
+		</div>
+
+		<script>
+			const Buffer = bsv.deps.Buffer;
+			const hexToAscii = (hex) => {
+				return Buffer.from(hex, "hex").toString("ascii");
+			};
+			async function getTxInfo(txid) {
+				const imageUrl =
+					"https://plugins.whatsonchain.com/api/plugin/main/" + txid;
+				return new Promise((resolve, reject) => {
+					const image = new Image();
+					image.onload = () => resolve(image);
+					image.onerror = () => reject(new Error("Failed to load image"));
+					image.crossOrigin = "Anonymous"; // To avoid CORS issues
+					image.src = imageUrl;
+					document.getElementById("txPic").src = imageUrl;
+				});
+			}
+
+			function encryptData(data, password) {
+				var encrypted = CryptoJS.AES.encrypt(data, password);
+				return encrypted.toString();
+			}
+			function decryptData(data, password) {
+				var decrypted = CryptoJS.AES.decrypt(data, password);
+				return decrypted.toString(CryptoJS.enc.Utf8);
+			}
+
+			function decodeText() {
+				document.getElementById("status").innerText = "Please wait...";
+				const imageInput = document.getElementById("imageToDecode");
+				const password = document.getElementById("password2").value;
+				if (!imageInput.files[0] || !password) {
+					alert("Please select an image to decode.");
+					return;
+				}
+
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					const img = new Image();
+					img.onload = function () {
+						const canvas = document.getElementById("canvas");
+						canvas.width = img.width;
+						canvas.height = img.height;
+
+						const ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0);
+
+						const imageData = ctx.getImageData(
+							0,
+							0,
+							canvas.width,
+							canvas.height
+						);
+						const data = imageData.data;
+						let text = "";
+
+						for (let i = 0; i < data.length; i += 4 * 8) {
+							let charCode = 0;
+							for (let j = 0; j < 8; j++) {
+								charCode |= (data[i + j * 4 + 2] & 1) << j;
+							}
+							if (charCode === 0) break; // Null character signifies end of text
+							text += String.fromCharCode(charCode);
+						}
+						text = decryptData(text, password);
+						if (text === "") {
+							alert("Wrong password");
+							return;
+						}
+						document.getElementById("decodedText").innerText =
+							"Decoded Text: " + text;
+					};
+					img.src = event.target.result;
+				};
+				reader.readAsDataURL(imageInput.files[0]);
+				document.getElementById("status").innerText = "";
+			}
+			function embedText() {
+				document.getElementById("status").innerText = "Please wait...";
+				const imageInput = document.getElementById("imageUpload");
+				let text = document.getElementById("textToHide").value;
+				const password = document.getElementById("password").value;
+				if (!imageInput.files[0] || !text || !password) {
+					alert("Please select an image and enter text to hide.");
+					return;
+				}
+				text = text.trim();
+				text = encryptData(text, password);
+				const reader = new FileReader();
+				reader.onload = function (event) {
+					const img = new Image();
+					img.onload = function () {
+						const canvas = document.getElementById("canvas");
+						canvas.width = img.width;
+						canvas.height = img.height;
+
+						const ctx = canvas.getContext("2d");
+						ctx.drawImage(img, 0, 0);
+
+						const imageData = ctx.getImageData(
+							0,
+							0,
+							canvas.width,
+							canvas.height
+						);
+						const data = imageData.data;
+
+						for (let i = 0; i < text.length; i++) {
+							// Get the ASCII code of each character
+							const ascii = text.charCodeAt(i);
+							// Embed each character in the last 8 pixels
+							for (let j = 0; j < 8; j++) {
+								// Shift and get each bit of the character
+								const bit = (ascii >> j) & 1;
+								// Embed the bit in the least significant bit of the blue channel
+								data[(i * 8 + j) * 4 + 2] =
+									(data[(i * 8 + j) * 4 + 2] & ~1) | bit;
+							}
+						}
+
+						// Update the canvas with the modified image
+						ctx.putImageData(imageData, 0, 0);
+
+						// Display the result
+						const resultImage = document.getElementById("resultImage");
+						resultImage.src = canvas.toDataURL("image/png");
+						resultImage.style.display = "block";
+					};
+					img.src = event.target.result;
+				};
+
+				reader.readAsDataURL(imageInput.files[0]);
+				document.getElementById("status").innerText = "";
+			}
+
+			async function decodeTxid() {
+				document.getElementById("status").innerText = "Please wait...";
+				let txid = document.getElementById("txid").value;
+				const password = document.getElementById("password3").value;
+				if (!txid || !password) {
+					alert("Please enter txid and password.");
+					return;
+				}
+				txid = txid.trim();
+				try {
+					const image = await getTxInfo(txid);
+					console.log(image);
+					const canvas = document.getElementById("canvas");
+					canvas.width = image.width;
+					canvas.height = image.height;
+					const ctx = canvas.getContext("2d");
+					ctx.drawImage(image, 0, 0);
+					const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+					let decodedText = extractTextFromImageData(imageData);
+					decodedText = decryptData(decodedText, password);
+					if (decodedText === "") {
+						alert("Wrong password");
+						document.getElementById("status").innerText = "";
+						return;
+					}
+					document.getElementById("decodedText2").innerText =
+						"Decoded Text: " + decodedText;
+					document.getElementById("status").innerText = "";
+				} catch (error) {
+					alert(error.message);
+					document.getElementById("status").innerText = "";
+				}
+			}
+
+			function extractTextFromImageData(imageData) {
+				const data = imageData.data;
+				let text = "";
+				for (let i = 0; i < data.length; i += 4 * 8) {
+					let charCode = 0;
+					for (let j = 0; j < 8; j++) {
+						charCode |= (data[i + j * 4 + 2] & 1) << j;
+					}
+					if (charCode === 0) break; // Null character signifies end of text
+					text += String.fromCharCode(charCode);
+				}
+				return text;
+			}
+
+			function downloadImage() {
+				const canvas = document.getElementById("canvas");
+				const image = canvas
+					.toDataURL("image/png")
+					.replace("image/png", "image/octet-stream");
+
+				// Create a temporary link to trigger the download
+				const link = document.createElement("a");
+				link.download = "hidden-text-image.png";
+				link.href = image;
+				document.body.appendChild(link);
+				link.click();
+				document.body.removeChild(link);
+			}
+
+			function showEncrypt() {
+				document.getElementById("encrypt").style.display = "block";
+				document.getElementById("decrypt").style.display = "none";
+				document.getElementById("decryptTxid").style.display = "none";
+			}
+			function showDecrypt() {
+				document.getElementById("encrypt").style.display = "none";
+				document.getElementById("decrypt").style.display = "block";
+				document.getElementById("decryptTxid").style.display = "none";
+			}
+			function showDecryptTxid() {
+				// alert("coming soon");
+				// return;
+				document.getElementById("encrypt").style.display = "none";
+				document.getElementById("decrypt").style.display = "none";
+				document.getElementById("decryptTxid").style.display = "block";
+			}
+		</script>
+	</body>
+</html>
